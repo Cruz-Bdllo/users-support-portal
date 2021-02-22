@@ -3,7 +3,7 @@ package com.code.supportportal.constant;
 
 public class SecurityConstant {
 
-    public static final long EXPIRATION_TIME = 432_000_000; //  Represent expiration in 5 days
+    public static final int EXPIRATION_TIME = 5; //  Represent expiration in 5 days
     public static final String TOKEN_PREFIX = "Bearer ";
     public static final String JWT_TOKEN_HEADER = "Jwt-Token";
     public static final String TOKEN_CANNOT_BE_VERIFIED = "Token cannot be verified";
