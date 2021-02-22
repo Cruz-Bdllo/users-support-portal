@@ -8,7 +8,7 @@ import java.util.Date;
 @Table(name = "users")
 public class User implements Serializable {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(nullable = false, updatable = false)
     private long id;
     private String userId;
