@@ -1,22 +1,25 @@
 package com.code.supportportal.response;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import org.springframework.http.HttpStatus;
 
 import java.time.LocalDateTime;
+import java.util.Date;
 
 public class HttpResponse {
     private HttpStatus httpStatus;
-    private String statusCode;
+    private int statusCode;
     private String reason;
     private String message;
-    private LocalDateTime timeAt;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "MM-dd-yyyy HH:mm:ss", timezone = "America/Mexico_City")
+    private Date timeStamp;
 
     public static class HttpResponseBuilder {
         private HttpStatus httpStatus;
-        private String statusCode;
+        private int statusCode;
         private String reason;
         private String message;
-        private LocalDateTime timeAt;
+        private Date timeStamp;
 
         public static HttpResponseBuilder anResponse() {
             return new HttpResponseBuilder();
@@ -27,7 +30,7 @@ public class HttpResponse {
             return this;
         }
 
-        public HttpResponseBuilder withStatusCode(String statusCode) {
+        public HttpResponseBuilder withStatusCode(int statusCode) {
             this.statusCode = statusCode;
             return this;
         }
@@ -41,8 +44,8 @@ public class HttpResponse {
             return this;
         }
 
-        public HttpResponseBuilder withTimeAt(LocalDateTime timeAt) {
-            this.timeAt = timeAt;
+        public HttpResponseBuilder withTimeAt(Date timeStamp) {
+            this.timeStamp = timeStamp;
             return this;
         }
 
@@ -52,7 +55,7 @@ public class HttpResponse {
             response.setStatusCode(this.statusCode);
             response.setReason(this.reason);
             response.setMessage(this.message);
-            response.setTimeAt(this.timeAt);
+            response.setTimeStamp(this.timeStamp);
 
             return response;
         }
@@ -67,11 +70,11 @@ public class HttpResponse {
         this.httpStatus = httpStatus;
     }
 
-    public String getStatusCode() {
+    public int getStatusCode() {
         return statusCode;
     }
 
-    public void setStatusCode(String statusCode) {
+    public void setStatusCode(int statusCode) {
         this.statusCode = statusCode;
     }
 
@@ -91,11 +94,11 @@ public class HttpResponse {
         this.message = message;
     }
 
-    public LocalDateTime getTimeAt() {
-        return timeAt;
+    public Date getTimeStamp() {
+        return timeStamp;
     }
 
-    public void setTimeAt(LocalDateTime timeAt) {
-        this.timeAt = timeAt;
+    public void setTimeStamp(Date timeStamp) {
+        this.timeStamp = timeStamp;
     }
 } // end response class
