@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.util.Date;
 
 import static com.code.supportportal.constant.SecurityConstant.ACCESS_DENIED_MESSAGE;
 import static org.springframework.http.HttpStatus.UNAUTHORIZED;
@@ -29,10 +30,10 @@ public class JwtAccessDeniedHandle implements AccessDeniedHandler {
                        AccessDeniedException exception) throws IOException, ServletException {
         HttpResponse errorResponse = HttpResponse.HttpResponseBuilder.anResponse()
                 .withHttpStatus(UNAUTHORIZED)
-                .withStatusCode(UNAUTHORIZED.toString())
+                .withStatusCode(UNAUTHORIZED.value())
                 .withReason(UNAUTHORIZED.getReasonPhrase().toUpperCase())
                 .withMessage(ACCESS_DENIED_MESSAGE)
-                .withTimeAt(LocalDateTime.now(ZoneOffset.UTC))
+                .withTimeAt(new Date())
                 .buildResponse();
 
         response.setContentType(APPLICATION_JSON_VALUE);

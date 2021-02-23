@@ -6,6 +6,7 @@ import com.code.supportportal.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -15,6 +16,7 @@ import java.util.Date;
 import java.util.Optional;
 
 @Service
+@Qualifier("myUserDetailsService")
 public class UserDetailsServicePrincipal implements UserDetailsService {
 
     private UserRepository userRepository;
