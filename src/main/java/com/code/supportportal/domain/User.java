@@ -21,7 +21,7 @@ public class User implements Serializable {
     private Date lastLoginDateDisplay;
     private Date joinDate;
     private String profileImageUrl;
-    private String[] roles;
+    private String role;
     private String[] authorities;
     private boolean isActive;
     private boolean isNotLocked;
@@ -33,7 +33,7 @@ public class User implements Serializable {
                 String username, String password, String email,
                 Date lastLoginDate, Date lastLoginDateDisplay,
                 Date joinDate, String profileImageUrl,
-                String[] roles, String[] authorities,
+                String role, String[] authorities,
                 boolean isActive, boolean isNotLocked) {
         this.id = id;
         this.userId = userId;
@@ -46,7 +46,7 @@ public class User implements Serializable {
         this.lastLoginDateDisplay = lastLoginDateDisplay;
         this.joinDate = joinDate;
         this.profileImageUrl = profileImageUrl;
-        this.roles = roles;
+        this.role = role;
         this.authorities = authorities;
         this.isActive = isActive;
         this.isNotLocked = isNotLocked;
@@ -140,12 +140,12 @@ public class User implements Serializable {
         this.profileImageUrl = profileImageUrl;
     }
 
-    public String[] getRoles() {
-        return roles;
+    public String getRole() {
+        return role;
     }
 
-    public void setRoles(String[] roles) {
-        this.roles = roles;
+    public void setRoles(String role) {
+        this.role = role;
     }
 
     public String[] getAuthorities() {
