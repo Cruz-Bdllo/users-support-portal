@@ -18,10 +18,12 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import java.util.Date;
 import java.util.List;
 
+import static com.code.supportportal.constant.UserServiceImpConstant.*;
 import static com.code.supportportal.enums.Role.ROLE_USER;
 
 @Service
 public class UserServiceImp implements UserService{
+
 
     private UserRepository userRepo;
     private PasswordEncoder passwordEncoder;
@@ -46,6 +48,7 @@ public class UserServiceImp implements UserService{
         newUser.setFirstName(firstName);
         newUser.setLastName(lastName);
         newUser.setUsername(username);
+        newUser.setEmail(email);
         newUser.setPassword(passwordEncoded);
         newUser.setJoinDate(new Date());
         newUser.setActive(true);
@@ -65,7 +68,7 @@ public class UserServiceImp implements UserService{
 
     private String getTemporaryProfileImageUrl() {
         // Get current domain context (ie: https://domain or http://localhost:8081)
-        return ServletUriComponentsBuilder.fromCurrentContextPath().path("/user/image/profile/temp").toUriString();
+        return ServletUriComponentsBuilder.fromCurrentContextPath().path(USER_DEFAULT_IMAGE_PATH).toUriString();
     }
 
     private String generatePassword() {
@@ -78,30 +81,28 @@ public class UserServiceImp implements UserService{
     }
 
     private User validateUsernameAndEmail(String currentUsername, String newUsername, String newEmail){
+        User currentUser = findUserByUsername(currentUsername);
+        User findNewUser = findUserByUsername(newUsername);
+        User emailUser = findUserByEmail(newEmail);
         if(StringUtils.isNotBlank(currentUsername)){ // If update user
-            User currentUser = findUserByUsername(currentUsername);
             if(currentUser == null){
-                throw new UserNotFoundException("No user found with username: " + currentUsername);
+                throw new UserNotFoundException(USERNAME_NOT_FOUND + currentUsername);
             }
 
-            User findNewUser = findUserByUsername(newUsername);
             if(findNewUser != null && !currentUser.getId().equals(findNewUser.getId())) {
-                throw new UsernameExistException("The username already exists");
+                throw new UsernameExistException(USERNAME_ALREADY_EXISTS);
             }
 
-            User emailUser = findUserByEmail(newEmail);
             if(emailUser != null && !currentUser.getId().equals(emailUser.getId())) {
-                throw new EmailExistException("The emails already exists");
+                throw new EmailExistException(EMAIL_ALREADY_EXIST);
             }
             return currentUser;
         }else{ // If new user
-            User userFind = findUserByUsername(newUsername);
-            if(userFind != null){
-                throw new UsernameExistException("The username already exist");
+            if(findNewUser != null){
+                throw new UsernameExistException(USERNAME_ALREADY_EXISTS);
             }
-            User emailFind = findUserByEmail(newEmail);
-            if(emailFind != null){
-                throw new EmailExistException("The email already exist");
+            if(emailUser != null){
+                throw new EmailExistException(EMAIL_ALREADY_EXIST);
             }
             return null;
         }
@@ -110,19 +111,20 @@ public class UserServiceImp implements UserService{
     @Override
     @Transactional(readOnly = true)
     public List<User> getUsers() {
-        return null;
+        return userRepo.findAll();
     }
 
     @Override
     @Transactional(readOnly = true)
     public User findUserByUsername(String username) {
-        return null;
+        return userRepo.findUserByUsername(username)
+                .orElseThrow(() -> new UserNotFoundException(USERNAME_NOT_FOUND));
     }
 
     @Override
     @Transactional(readOnly = true)
     public User findUserByEmail(String email) {
-        return null;
+        return userRepo.findUserByEmail(email);
     }
 
 
