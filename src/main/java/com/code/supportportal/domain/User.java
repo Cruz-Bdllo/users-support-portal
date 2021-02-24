@@ -10,7 +10,7 @@ public class User implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(nullable = false, updatable = false)
-    private long id;
+    private Long id;
     private String userId;
     private String firstName;
     private String lastName;
@@ -29,7 +29,7 @@ public class User implements Serializable {
     public User() {
     }
 
-    public User(long id, String userId, String firstName, String lastName,
+    public User(Long id, String userId, String firstName, String lastName,
                 String username, String password, String email,
                 Date lastLoginDate, Date lastLoginDateDisplay,
                 Date joinDate, String profileImageUrl,
@@ -52,11 +52,11 @@ public class User implements Serializable {
         this.isNotLocked = isNotLocked;
     }
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -144,7 +144,7 @@ public class User implements Serializable {
         return role;
     }
 
-    public void setRoles(String role) {
+    public void setRole(String role) {
         this.role = role;
     }
 
