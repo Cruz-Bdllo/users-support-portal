@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/user")
-public class UserResource extends ExceptionHandling {
+public class UserController extends ExceptionHandling {
 
     @GetMapping("/home")
     public String showUser() {
