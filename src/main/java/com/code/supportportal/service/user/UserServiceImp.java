@@ -10,6 +10,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -81,10 +82,10 @@ public class UserServiceImp implements UserService{
     }
 
     private User validateUsernameAndEmail(String currentUsername, String newUsername, String newEmail){
-        User currentUser = findUserByUsername(currentUsername);
         User findNewUser = findUserByUsername(newUsername);
         User emailUser = findUserByEmail(newEmail);
         if(StringUtils.isNotBlank(currentUsername)){ // If update user
+            User currentUser = findUserByUsername(currentUsername);
             if(currentUser == null){
                 throw new UserNotFoundException(USERNAME_NOT_FOUND + currentUsername);
             }
@@ -117,8 +118,9 @@ public class UserServiceImp implements UserService{
     @Override
     @Transactional(readOnly = true)
     public User findUserByUsername(String username) {
-        return userRepo.findUserByUsername(username)
-                .orElseThrow(() -> new UserNotFoundException(USERNAME_NOT_FOUND));
+        /*return userRepo.findUserByUsername(username)*/
+        /*        .orElseThrow(() -> new UserNotFoundException(USERNAME_NOT_FOUND));*/
+        return userRepo.findUserByUsername(username).orElse(null);
     }
 
     @Override
