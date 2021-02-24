@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.HttpServerErrorException.InternalServerError;
+import org.springframework.web.servlet.NoHandlerFoundException;
 
 import javax.persistence.NoResultException;
 import java.io.IOException;
@@ -111,6 +112,12 @@ public class ExceptionHandling {
     @ExceptionHandler(UserNotFoundException.class)
     public ResponseEntity<HttpResponse> userNotFoundException(UserNotFoundException ex){
         return createResponse(HttpStatus.BAD_REQUEST, ex.getMessage().toUpperCase());
+    }
+
+    // 1 Way custom white label with exception handler
+    @ExceptionHandler(NoHandlerFoundException.class)
+    public ResponseEntity<HttpResponse> noHandlerFoundException(NoHandlerFoundException ex){
+        return createResponse(HttpStatus.NOT_FOUND, "This page was not found");
     }
 
 
