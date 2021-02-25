@@ -1,7 +1,9 @@
 package com.code.supportportal.service.user;
 
 import com.code.supportportal.domain.User;
+import com.code.supportportal.enums.Role;
 import com.code.supportportal.exception.domain.EmailExistException;
+import com.code.supportportal.exception.domain.EmailNotFoundException;
 import com.code.supportportal.exception.domain.UserNotFoundException;
 import com.code.supportportal.exception.domain.UsernameExistException;
 import com.code.supportportal.repository.UserRepository;
@@ -14,14 +16,22 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.mail.MessagingException;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Date;
 import java.util.List;
 
+import static com.code.supportportal.constant.FileConstant.*;
 import static com.code.supportportal.constant.UserServiceImpConstant.*;
 import static com.code.supportportal.enums.Role.ROLE_USER;
+import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
+import static org.apache.commons.lang3.StringUtils.EMPTY;
 
 @Service
 public class UserServiceImp implements UserService{
@@ -43,28 +53,28 @@ public class UserServiceImp implements UserService{
 
     @Override
     public User register(String firstName, String lastName, String username, String email) throws MessagingException {
-        validateUsernameAndEmail(StringUtils.EMPTY, username, email);
-        User newUser = new User();
+        validateUsernameAndEmail(EMPTY, username, email);
 
+        User newUser = new User();
         String password = generatePassword();
-        String passwordEncoded = encodedPassword(password);
 
         newUser.setUserId(generateUserId());
         newUser.setFirstName(firstName);
         newUser.setLastName(lastName);
         newUser.setUsername(username);
         newUser.setEmail(email);
-        newUser.setPassword(passwordEncoded);
+        newUser.setPassword(encodedPassword(password));
         newUser.setJoinDate(new Date());
         newUser.setActive(true);
         newUser.setNotLocked(true);
         newUser.setRole(ROLE_USER.name());
         newUser.setAuthorities(ROLE_USER.getAuthorities());
-        newUser.setProfileImageUrl(getTemporaryProfileImageUrl());
+        newUser.setProfileImageUrl(getTemporaryProfileImageUrl(username));
         LOGGER.info("Password: " + password);
 
         userRepo.save(newUser);
-        emailService.sendEmailWithNewPassword(newUser.getFirstName(), password, newUser.getEmail());
+        // change for a better service
+        // emailService.sendEmailWithNewPassword(newUser.getFirstName(), password, newUser.getEmail());
         return newUser;
     }
 
@@ -72,9 +82,9 @@ public class UserServiceImp implements UserService{
         return passwordEncoder.encode(password);
     }
 
-    private String getTemporaryProfileImageUrl() {
+    private String getTemporaryProfileImageUrl(String username) {
         // Get current domain context (ie: https://domain or http://localhost:8081)
-        return ServletUriComponentsBuilder.fromCurrentContextPath().path(USER_DEFAULT_IMAGE_PATH).toUriString();
+        return ServletUriComponentsBuilder.fromCurrentContextPath().path(DEFAULT_USER_IMAGE_PATH+username).toUriString();
     }
 
     private String generatePassword() {
@@ -134,5 +144,105 @@ public class UserServiceImp implements UserService{
         return userRepo.findUserByEmail(email);
     }
 
+    @Override
+    public User addNewUser(String firstName, String lastName, String username, String email,
+                           String role, boolean isNonLocked, boolean isActive, MultipartFile profileImage) throws IOException {
+        validateUsernameAndEmail(EMPTY, username, email);
+        User user = new User();
+        String password = generatePassword();
+        String userId = generateUserId();
+        user.setUserId(userId);
+        user.setFirstName(firstName);
+        user.setLastName(lastName);
+        user.setEmail(email);
+        user.setActive(isActive);
+        user.setNotLocked(isNonLocked);
+        user.setJoinDate(new Date());
+        user.setRole(getRoleEnumName(role).name());
+        user.setAuthorities(getRoleEnumName(role).getAuthorities());
+        user.setProfileImageUrl(getTemporaryProfileImageUrl(username));
+        userRepo.save(user);
 
+        saveProfileImageInDirectory(user, profileImage);
+        return user;
+    }
+
+    private void saveProfileImageInDirectory(User user, MultipartFile profileImage) throws IOException {
+        if(profileImage != null) {
+            // Get current folder of user (user.home/supportportal/user/{myUsername})
+            Path userFolder = Paths.get(USER_FOLDER + user.getUsername()).toAbsolutePath().normalize();
+
+            // Validate if exists
+            if(!Files.exists(userFolder)){
+                // if not exists then we created
+                Files.createDirectories(userFolder);
+                LOGGER.info(DIRECTORY_CREATED);
+            }
+
+            // Delete any image into directory (i.e. user.home/supportportal/user/{myUsername}/myusername.jpg)
+            Files.deleteIfExists(Paths.get(userFolder + user.getUsername() + DOT + JPG_EXTENSION));
+
+            // Storage the image in the path given
+            Files.copy(profileImage.getInputStream(),
+                    userFolder.resolve(user.getUsername() + user.getUsername() + DOT + JPG_EXTENSION),
+                    REPLACE_EXISTING);
+            user.setProfileImageUrl(setProfileImageUrl(user.getUsername()));
+            userRepo.save(user);
+            LOGGER.info(FILE_SAVED_IN_FILE_SYSTEM + profileImage.getOriginalFilename());
+
+        } // end validation
+    } // end save in directory
+
+    private String setProfileImageUrl(String username) {
+        return ServletUriComponentsBuilder.fromCurrentContextPath()
+                .path(USER_IMAGE_PATH+ username+FORWARD_SLASH + username + DOT+JPG_EXTENSION).toUriString();
+    }
+
+    private Role getRoleEnumName(String role) {
+        return Role.valueOf(role.toUpperCase());
+    }
+
+    @Override
+    public User updateUser(String currentUsername, String newFirstName, String newLastName, String newUsername,
+                           String newEmail, String role, boolean isNonLocked, boolean isActive, MultipartFile profileImage) throws IOException {
+        User userCurrent = validateUsernameAndEmail(currentUsername, newUsername, newEmail);
+        userCurrent.setFirstName(newFirstName);
+        userCurrent.setLastName(newLastName);
+        userCurrent.setUsername(newUsername);
+        userCurrent.setEmail(newEmail);
+        userCurrent.setRole(getRoleEnumName(role).name());
+        userCurrent.setNotLocked(isNonLocked);
+        userCurrent.setActive(isActive);
+        userRepo.save(userCurrent);
+        saveProfileImageInDirectory(userCurrent, profileImage);
+
+        return userCurrent;
+    }
+
+    @Override
+    public void deleteUser(Long id) {
+        userRepo.deleteById(id);
+    }
+
+    @Override
+    public void resetPassword(String email) {
+        User user = userRepo.findUserByEmail(email);
+        if(user == null){
+            throw new EmailNotFoundException(String.format(EMAIL_NOT_FOUND, email));
+        }
+        // Generate new password
+        String password = generatePassword();
+        // Save new Password
+        user.setPassword(encodedPassword(password));
+        userRepo.save(user);
+        // send by email
+        // emailService.sendEmailWithNewPassword(user.getFirstName(), password, user.getEmail());
+    }
+
+    @Override
+    public User updateProfileImage(String username, MultipartFile profileImage) throws IOException {
+        User user = validateUsernameAndEmail(username, null, null);
+        saveProfileImageInDirectory(user, profileImage);
+        return user;
+    }
 }
