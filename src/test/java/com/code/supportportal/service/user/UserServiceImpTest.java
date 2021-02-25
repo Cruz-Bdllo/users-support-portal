@@ -12,6 +12,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import javax.mail.MessagingException;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -50,7 +51,7 @@ class UserServiceImpTest {
     );
 
     @Test
-    void testRegister() {
+    void testRegister() throws MessagingException {
         User userRequest = new User();
         userRequest.setFirstName(userExpected.getFirstName());
         userRequest.setLastName(userExpected.getLastName());

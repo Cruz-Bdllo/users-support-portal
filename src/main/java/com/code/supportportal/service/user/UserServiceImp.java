@@ -5,17 +5,18 @@ import com.code.supportportal.exception.domain.EmailExistException;
 import com.code.supportportal.exception.domain.UserNotFoundException;
 import com.code.supportportal.exception.domain.UsernameExistException;
 import com.code.supportportal.repository.UserRepository;
+import com.code.supportportal.service.email.EmailService;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import javax.mail.MessagingException;
 import java.util.Date;
 import java.util.List;
 
@@ -28,17 +29,20 @@ public class UserServiceImp implements UserService{
 
     private UserRepository userRepo;
     private BCryptPasswordEncoder passwordEncoder;
+    private EmailService emailService;
     private final Logger LOGGER = LoggerFactory.getLogger(UserServiceImp.class);
 
     @Autowired
     public UserServiceImp(UserRepository userRepo,
-                          BCryptPasswordEncoder passwordEncoder) {
+                          BCryptPasswordEncoder passwordEncoder,
+                          EmailService emailService) {
         this.userRepo = userRepo;
         this.passwordEncoder = passwordEncoder;
+        this.emailService = emailService;
     }
 
     @Override
-    public User register(String firstName, String lastName, String username, String email) {
+    public User register(String firstName, String lastName, String username, String email) throws MessagingException {
         validateUsernameAndEmail(StringUtils.EMPTY, username, email);
         User newUser = new User();
 
@@ -60,6 +64,7 @@ public class UserServiceImp implements UserService{
         LOGGER.info("Password: " + password);
 
         userRepo.save(newUser);
+        emailService.sendEmailWithNewPassword(newUser.getFirstName(), password, newUser.getEmail());
         return newUser;
     }
 
