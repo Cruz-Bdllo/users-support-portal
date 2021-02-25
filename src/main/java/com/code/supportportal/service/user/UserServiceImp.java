@@ -27,12 +27,12 @@ public class UserServiceImp implements UserService{
 
 
     private UserRepository userRepo;
-    private PasswordEncoder passwordEncoder;
+    private BCryptPasswordEncoder passwordEncoder;
     private final Logger LOGGER = LoggerFactory.getLogger(UserServiceImp.class);
 
     @Autowired
     public UserServiceImp(UserRepository userRepo,
-                          PasswordEncoder passwordEncoder) {
+                          BCryptPasswordEncoder passwordEncoder) {
         this.userRepo = userRepo;
         this.passwordEncoder = passwordEncoder;
     }
