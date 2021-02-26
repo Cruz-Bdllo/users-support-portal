@@ -1,7 +1,5 @@
 package com.code.supportportal.controller;
 
-import com.code.supportportal.constant.FileConstant;
-import com.code.supportportal.constant.SecurityConstant;
 import com.code.supportportal.domain.User;
 import com.code.supportportal.exception.domain.ExceptionHandling;
 import com.code.supportportal.principal.UserDetailsPrincipal;
@@ -18,7 +16,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.mail.MessagingException;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -31,7 +28,11 @@ import static com.code.supportportal.constant.FileConstant.*;
 import static com.code.supportportal.constant.SecurityConstant.JWT_TOKEN_HEADER;
 import static org.springframework.http.HttpStatus.*;
 import static org.springframework.http.MediaType.IMAGE_JPEG_VALUE;
-
+/*
+fireward: PlgSefp2Ec
+rick: enfKqvffsN
+summer: iBUztAOKhT
+* */
 @RestController
 @RequestMapping("/user")
 public class UserController extends ExceptionHandling {
@@ -74,7 +75,8 @@ public class UserController extends ExceptionHandling {
                                         @RequestParam String username, @RequestParam String email,
                                         @RequestParam String role, @RequestParam String isNonLocked,
                                         @RequestParam String isActive,
-                                        @RequestParam(required = false) MultipartFile profileImage) throws IOException {
+                                        @RequestParam(value = "profileImage", required = false)
+                                                    MultipartFile profileImage) throws IOException {
         User newUser = userService.addNewUser(firstName, lastName, username, email, role,
                 Boolean.parseBoolean(isNonLocked), Boolean.parseBoolean(isActive), profileImage);
         return new ResponseEntity<>(newUser, CREATED);

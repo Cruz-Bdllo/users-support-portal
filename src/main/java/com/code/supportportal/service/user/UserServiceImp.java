@@ -154,7 +154,9 @@ public class UserServiceImp implements UserService{
         user.setUserId(userId);
         user.setFirstName(firstName);
         user.setLastName(lastName);
+        user.setUsername(username);
         user.setEmail(email);
+        user.setPassword(encodedPassword(password));
         user.setActive(isActive);
         user.setNotLocked(isNonLocked);
         user.setJoinDate(new Date());
@@ -184,7 +186,7 @@ public class UserServiceImp implements UserService{
 
             // Storage the image in the path given
             Files.copy(profileImage.getInputStream(),
-                    userFolder.resolve(user.getUsername() + user.getUsername() + DOT + JPG_EXTENSION),
+                    userFolder.resolve(user.getUsername() + DOT + JPG_EXTENSION),
                     REPLACE_EXISTING);
             user.setProfileImageUrl(setProfileImageUrl(user.getUsername()));
             userRepo.save(user);
@@ -211,6 +213,7 @@ public class UserServiceImp implements UserService{
         userCurrent.setUsername(newUsername);
         userCurrent.setEmail(newEmail);
         userCurrent.setRole(getRoleEnumName(role).name());
+        userCurrent.setAuthorities(getRoleEnumName(role).getAuthorities());
         userCurrent.setNotLocked(isNonLocked);
         userCurrent.setActive(isActive);
         userRepo.save(userCurrent);
@@ -232,6 +235,7 @@ public class UserServiceImp implements UserService{
         }
         // Generate new password
         String password = generatePassword();
+        LOGGER.info("The new password for email " + email + " is: " + password);
         // Save new Password
         user.setPassword(encodedPassword(password));
         userRepo.save(user);

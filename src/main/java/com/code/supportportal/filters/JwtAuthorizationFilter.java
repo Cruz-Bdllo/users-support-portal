@@ -1,9 +1,7 @@
 package com.code.supportportal.filters;
 
-import com.code.supportportal.constant.SecurityConstant;
 import com.code.supportportal.utility.JwtTokenProvider;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;

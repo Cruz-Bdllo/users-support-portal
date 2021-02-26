@@ -1,5 +1,6 @@
 package com.code.supportportal.service.user;
 
+import com.code.supportportal.constant.FileConstant;
 import com.code.supportportal.domain.User;
 import com.code.supportportal.exception.domain.EmailExistException;
 import com.code.supportportal.exception.domain.UsernameExistException;
@@ -18,7 +19,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
-import static com.code.supportportal.constant.UserServiceImpConstant.USER_DEFAULT_IMAGE_PATH;
+import static com.code.supportportal.constant.FileConstant.DEFAULT_USER_IMAGE_PATH;
 import static com.code.supportportal.enums.Role.ROLE_USER;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -38,15 +39,15 @@ class UserServiceImpTest {
     private final String username = "codexy";
     private final String email = "cubj25@gmail.com";
     private final User userExpected = new User(1L, "0123456789", "juan", "badillo", "codexy", "123jb123bj12b312",
-            "cubj25@gmail.com", null, null, new Date(), USER_DEFAULT_IMAGE_PATH, ROLE_USER.name(),
+            "cubj25@gmail.com", null, null, new Date(), DEFAULT_USER_IMAGE_PATH, ROLE_USER.name(),
             ROLE_USER.getAuthorities(), true, true);
     private final List<User> usersExpected = Arrays.asList(
             userExpected,
             new User(2L, "0123456781", "jua", "adillo", "jcode", "123jb123bj12b312",
-                    "cubj25@gmail.cm", null, null, new Date(), USER_DEFAULT_IMAGE_PATH, ROLE_USER.name(),
+                    "cubj25@gmail.cm", null, null, new Date(), DEFAULT_USER_IMAGE_PATH, ROLE_USER.name(),
                     ROLE_USER.getAuthorities(), true, true),
             new User(3L, "0123456782", "jun", "bdillo", "codi", "123jb123bj12b312",
-                    "cubj25@gmail.co", null, null, new Date(), USER_DEFAULT_IMAGE_PATH, ROLE_USER.name(),
+                    "cubj25@gmail.co", null, null, new Date(), DEFAULT_USER_IMAGE_PATH, ROLE_USER.name(),
                     ROLE_USER.getAuthorities(), true, true)
     );
 

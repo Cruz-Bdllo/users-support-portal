@@ -1,6 +1,5 @@
 package com.code.supportportal.enums;
 
-import com.code.supportportal.constant.Authority;
 
 import static com.code.supportportal.constant.Authority.*;
 
